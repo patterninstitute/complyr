@@ -11,39 +11,24 @@ R.
 
 > Given enough rules, all code conforms.
 
-Desired features and key ideas:
+Key Features
 
-- **Compliance Definition:** Compliance refers to meeting predefined
-  gold standards. For example, if under certain circumstances, the exact
-  results of a statistical test can be predicted using mathematical
-  theory, one may define a gold standard with specific numerical
-  accuracy.
-- **Unit Tests for Compliance:** Utilize unit tests as a method for
-  recognizing or enforcing compliance.
-- **Third-Party Compliance Tests:** Compliance tests are written by
-  third parties, such as auditors or domain experts, rather than the
-  authors of the methods being tested.
-- **Compliance Packages:** Auditors create compliance packages that
-  include compliance tests as functions. These packages can be
-  documented, indexed in a compliance specification, and versioned like
-  any other package.
-- **Gold Standards as Functions:** Gold standards are provided as
-  functions within auditor packages as part of their API, enabling
-  method implementors to check against these fixtures.
-- **Assessment of Methods’ Packages:** Methods’ packages can be assessed
-  by compliance packages by integrating compliance tests from auditor
-  packages into their own testing framework.
-- **CI Integration:** complyr should support continuous integration
-  (CI), enabling the automation of compliance reports and the showing
-  off of badges/stamps/seals of compliance.
-- **Function Registration:** Facilitate the registration of functions in
-  methods’ packages using dedicated roxygen2 tags for testing with
-  compliance packages, e.g., `#' @comply pkg test01`.
-- Even though in general it may be difficult to set expectations, in
-  specific notable cases it may be possible to set expectations about
-  methods’ results very accurately or even exactly. If enough of these
-  notable cases are provided, then one might be able to steer an
-  implementor towards correctness.
+- Compliance Definition: Meet predefined gold standards.
+- Unit Tests: Use unit tests to ensure compliance.
+- Third-Party Tests: Auditors or experts create compliance tests, not
+  method authors.
+- Compliance Packages: Auditors create packages with compliance tests,
+  which can be documented, indexed, and versioned.
+- Gold Standards: Provided as functions in auditor packages for checking
+  results.
+- Method Assessment: Methods’ packages can include compliance tests from
+  auditor packages.
+- CI Integration: Supports continuous integration (CI) for automated
+  compliance reports and badges.
+- Function Registration: Use roxygen2 tags to register functions for
+  compliance testing, e.g., `#' @comply pkg test01`.
+- Setting Expectations: Specific cases can have exact expectations to
+  guide correctness.
 
 ## Installation
 
@@ -74,7 +59,7 @@ std_rounding <- base::round
 # Compliance test for rounding (very simple)
 # Inside the test code, you use `.f()` as a placeholder verb for the method to
 # be tested.
-rounding_cmpl_test01 <- create_compliance_test(desc = "rounding is compliant", code = {
+rounding_test <- new_compliance_test(desc = "rounding is compliant", code = {
   # rounds to the even number when equidistant
   testthat::expect_identical(.f(2.5), 2)
   testthat::expect_identical(.f(3.5), 4)
@@ -82,12 +67,12 @@ rounding_cmpl_test01 <- create_compliance_test(desc = "rounding is compliant", c
   # Otherwise, round to the nearest whole number
   testthat::expect_identical(.f(2.2), 2)
   testthat::expect_identical(.f(2.7), 3)
-}, .f = std_rounding)
+}, ref_fn = std_rounding)
 
-# `rounding_cmpl_test01()` becomes self-validating if an implementation was
-# passed to `.f`
-rounding_cmpl_test01()
-#> Test passed 🥳
+# `rounding_test()` becomes self-validating if a reference implementation was
+# passed to `ref_fn`.
+rounding_test()
+#> Test passed 🎊
 ```
 
 Now, let us say that the janitor package wanted to be credited with also
@@ -95,7 +80,7 @@ complying with the above rounding definition. Then, janitor authors
 would submit their function to the compliance test created above:
 
 ``` r
-try(rounding_cmpl_test01(janitor::round_half_up))
+try(rounding_test(janitor::round_half_up))
 #> ── Failure: rounding is compliant ──────────────────────────────────────────────
 #> .f(2.5) not identical to 2.
 #> 1/1 mismatches
