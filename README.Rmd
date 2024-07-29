@@ -107,7 +107,7 @@ std_rounding <- base::round
 #' @returns Run for its side effect of performing the compliance test.
 #'
 #' @export
-rounding_cmpl_test01 <- create_compliance_test(desc = "rounding is compliant", code = {
+rounding_test <- new_compliance_test(desc = "rounding is compliant", code = {
   # rounds to the even number when equidistant
   testthat::expect_identical(.f(2.5), 2)
   testthat::expect_identical(.f(3.5), 4)
@@ -115,7 +115,7 @@ rounding_cmpl_test01 <- create_compliance_test(desc = "rounding is compliant", c
   # Otherwise, round to the nearest whole number
   testthat::expect_identical(.f(2.2), 2)
   testthat::expect_identical(.f(2.7), 3)
-}, .f = std_rounding)
+}, ref_fn = std_rounding)
 ```
 
 And the package (e.g. janitor) providing the function to be tested would
@@ -140,7 +140,7 @@ by pulling from the auditor package `{auditor.rounding}`.
 #' @param digits how many digits should be displayed after the decimal point?
 #' @returns A vector with the same length as `x`
 #'
-#' @comply auditor.rounding rounding_cmpl_test01
+#' @comply auditor.rounding rounding_test
 #' 
 #' @export
 #' @examples
